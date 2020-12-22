@@ -1,0 +1,230 @@
+---
+title: "Ontario Renting: Localtion Difference & Pets are Effecting Rent "
+author: Yan Wang
+output: pdf_document
+date: 21/12/2020
+---
+
+
+# Abstract
+This project focuses on how location difference (mainly about Downtown Toronto, Scarborough, and Mississauga) in Ontario and wether the tenant have a pet could affect the rent.Statistical models such as linear regressions are used
+in the analyses. The results lead to the conclusion that both location difference and pets have influences on rent in Ontario.
+
+# Keywords
+Keywords: rent, Toronto, Mississauga, Scarborough, pet, apartment, condo, size, bedroom, bathroom, den.
+
+# Itroduction
+
+With the special time of COVID-19 period, major students are staying at home for quarantine and having online courses in rental apartments. Most of them live in Downtown Toronto with the purpose to be more convenience to get to university. However, is living in Downtown become necessary in this period? Obviously not. There are many other options for students to choose since there is no need to attend the class in person. Both Scarborough(along 401 highway) area and downtown Mississauga are popular for people to live with larger supermarkets, convenience transportation, and diverse restaurants. In addition,  you can find a larger room size in these two places since apartments in Downtown Toronto are all small-scale for the reasons of the limit land for residential buildings. More and more people are consider to settle down in these two locations rather than in Downtown.\newline
+
+One another factor that effecting rent is whether the tenant carring a pet. Some of rental apartments have strict regulation for the pets not only from land owner, also from the appartment management.\newline
+
+We would like to find the relationship between location difference and pets on rent in Ontario. Given that room size, room amount may be related, and pet species may be related. In the following part of
+the report I will introduce our the data, the statistical models that help to visualize the relationship. Eventually we will give a conclusion based on our analysis result, explaining how location difference and pets have influences on rent in Ontario. More detailed information about the variables and models will be further
+explained in the sections after.
+
+```{r,include=FALSE}
+library("ggplot2")
+library("tidyverse")
+library("dplyr")
+library("moderndive")
+library(readxl)
+rent <- read_excel("rent.xlsx")
+data=rent
+set.seed(1000)
+data=data[, -c(7)] 
+data=na.omit(data)
+df=data[sample(nrow(data),300),]
+```
+
+# Methology
+
+## Source
+We chose to analyze the data from Toronto Rentals, the rent information provided by apartment/condo management department and the house owner.
+
+## Target population
+The target population in the data includes all available listings in three different areas.
+
+## Smapling methodology and Sample
+By observing data, I remove the variable "parking" since it is missing lots of values. The data has simple random sample without replacement of records was performed in each stratum. Respondents were then randomly selected from the apartments/condos in different locations that registered in the system. 
+
+
+## Selected variables
+In order to analyze the affection on rent we select the variables below:\newline
+bedroom: Number of bedroom in the suite.\newline
+bathroom: Number of bedroom in the suite.\newline
+size: Suite size in square feet.\newline
+den: Number of bedroom in the suite.\newline
+pet: Whether the pet is allowed in suite.\newline
+location: Location of the suite. "T" represents Toronto, "M" represents Mississauga and "S" represents Scarborough.
+
+
+## Data
+```{r,echo=FALSE}
+head(df)
+```
+The rental information are randomly selected around or along\newline
+(1) University of Toronto in variable location T,\newline
+(2) Square one zone in variable location M, \newline
+(3) 401 highway in variable location S.\newline
+The variable "pet" are separate as YES and NO provide by owners and apartments.\newline
+The variable "rent","bedroom","bathroom","size","den" are numerical variable.
+Since the data are including both categorical and numerical variable, we use 0 to represent do not allow to have a pet, and 1 represents allow to have a pet.
+
+## Model
+```{r,echo=FALSE}
+mod1<-lm(rent~location+bedroom+bathroom+den+pet+`size(sqf)`, data=df)
+get_regression_table(mod1)
+
+```
+In order to determine the affections to rent, we the variable "location", "bedroom", "bathroom", "den", "pet", and "size". Since the "location" and "pet" are categorical variables, we have the reference group location in Mississauga as intercept from the linear model, and petYES count as 1 and petNO count as 0.
+The reason to choose a linear regression model to test the relationship of location and rent is to estimate the final rent after considering all the factors that may effect the rent.
+Our goal is find out how each variable effects the rent in Great Toronto area.
+
+
+
+The model is:
+
+$$\hat{rent} = \beta_0 +\beta_1 X_S \ + \beta_2 X_T+\beta_3 X_1 +\beta_4 X_2 +\beta_5 X_3+\beta_6 X_P+\beta_7 X_4+\epsilon_i $$
+$\hat{rent}$:represents the rent of the suite in the model.\newline
+
+$X_S$:represent the suite located in Scarborough.\newline
+
+$X_T$: represent the suite located in Toronto.\newline
+
+$X_1$:represents number of bedroom in the suite.\newline
+
+$X_2$:represents number of bathroom in the suite.\newline
+
+$X_3$:represents number of den in the suite.\newline
+
+$X_P$:represents the suite allows pet.\newline
+
+$X_4$:represents the size of the suite.\newline
+\newpage
+
+$$\beta_0 =896.69774, \beta_1 =-68.31753,\beta_2 =  298.50183,\beta_3 =325.11566,\beta_4 =317.30697 $$
+$$\beta_5 =137.43215 ,\beta_6 =82.28467 ,\beta_7 =0.18763$$
+$$\hat{rent} =896.69774 -68.31753 X_S \ + 298.50183 X_T+325.11566 X_1 + 317.30697  X_2 $$
+$$+137.43215 X_3+ 82.28467  X_P+ 0.18763X_4+\epsilon_i $$
+
+When $X_S$ the location is at Scarborough the average rent decrease 68.31753, given other predictors hold constant.
+\newline
+When $X_T$ the location is at Toronto, the average rent increase 298.50183, given other predictors hold constant.
+\newline
+When $X_1$ increase by one unit, the average rent increase 325.11566, given other predictors hold constant.
+\newline
+When $X_2$ increase by one unit, the average rent decrease 317.30697, given other predictors hold constant.
+\newline
+When $X_3$ increase by one unit, the average rent increase 137.43215, given other predictors hold constant.
+\newline
+When $X_P$ allows to have a pet in suite, the average rent increase 82.28467, given other predictors hold constant.
+\newline
+When $X_4$ increase by one unit, the average rent increase 0.18763, given other predictors hold constant.\newline
+
+
+
+
+
+
+Based on the linear regression model and t-test result, given 5% significant level, the significant variables are intercept, locationT, bedroom, bathroom, den and size since their p-values are less than 0.05 and reject the null hypothesis $H_0$=0.
+\newpage
+Next, we use AIC and BIC to test the model.\newline
+AIC:
+```{r,echo=FALSE}
+n=length(rent)
+step(mod1, direction = "backward")
+```
+
+BIC:
+```{r,echo=FALSE}
+n=length(rent)
+step(mod1, direction = "backward",k=log(n))
+```
+
+Both AIC and BIC shows the full model, which is
+$$\hat{rent} =896.69774 -68.31753 X_S \ + 298.50183 X_T+325.11566 X_1 + 317.30697  X_2 $$
+$$+137.43215 X_3+ 82.28467  X_P+ 0.18763X_4+\epsilon_i $$
+By observing the raw data, I found that the room size also has a huge differences in different locations
+```{r,echo=FALSE}
+dfT=df[df$location == "T",]
+mod2<-lm(rent~`size(sqf)`, data=dfT)
+get_regression_table(mod2)
+
+dfM=df[df$location == "M",]
+mod3<-lm(rent~`size(sqf)`, data=dfM)
+get_regression_table(mod3)
+
+dfS=df[df$location == "S",]
+mod4<-lm(rent~`size(sqf)`, data=dfS)
+get_regression_table(mod4)
+```
+The first graph is location in Toronto, the second graph is location in Mississauga, and the third one is in Scarborough. By comparing the coefficient of the size, location in Toronto increases the most by 2.311 dollar in rent by increasing 1 unit square feet of the room, and Scarborough increases the least by 0.080 dollar in rent by increasing 1 unit square feet of the room. Mississauga increases 0.852 dollar in rent by increasing 1 unit square feet.
+\newpage
+
+# Result
+Firstly, we create a multiple linear model for rent with predictors.
+
+### Figure1
+```{r,echo=FALSE}
+ggplot(df,aes(location,rent,colour=location))+geom_point()+ggtitle("Scatterplot of rent vs location")
+```
+```{r,include=FALSE}
+dfT=df[df$location == "T",]
+mean(dfT$rent)
+dfM=df[df$location == "M",]
+mean(dfM$rent)
+dfS=df[df$location == "S",]
+mean(dfS$rent)
+```
+
+
+By figure1 we observe that rent in Toronto has a wider range, and rent in Scarborough has narrower range. We get the mean rent 2182.708 in Toronto, 2083.58 in Mississauga and 1933.362 in Scarborough. Toronto has the highest mean rent, and Scarborough has the lowest mean rent.
+
+### Figure2
+```{r,echo=FALSE}
+ggplot(df,aes(pet,rent,colour=location))+geom_point()+ggtitle("Scatterplot of rent vs pet")
+```
+
+
+By figure2 we observe that rent with no pet has a wider range, and rent with pet has narrower range in all Toronto, Scarborough and Mississauga. The result shows that with pet restriction has more choices than without pet restriction.\newline
+
+By the linear model regression, we clearly get that location and pet regulation do effect the rent in Great Toronto area. Scarborough has the lowest rent with decreasing 68.3175 in average compare to other places. As mentioned before, we count without pet as 0, and with pet as 1. The model shows the rent increases 82.2847 on average, in all locations.\newline
+
+By other three models of different location and how the size will effect the rent, we can get the result that the large the house in Toronto, the more expensive rent, however the same size suite in Scarborough will be much cheapper.
+
+\newpage
+# Discussion
+
+## Summary
+The idea in the beginning is to find the relationship between different locations and rent, and how pet regulation will effect the rent. Then I clean the data and make sure the data is randomly select and the response are valid. Next we use linear regression model to test the accurate number of the rent and confirm the positive regression. Then we separate the data by location and test the linear regression separately to investigate the relationship between house size and rent.
+
+## Conlusion
+The model represents that living in downtown Toronto has a higher living cost from the basic housing. In addition, living in downtown Toronto is better to rent a small size apartment since the 1 unit of square feet of size is 2 times the amount compare to the same 1 unit square in Mississauga and almost 30 times in Scarborough. By observing the raw data in the original website, the major residence for rent are the houses, or basement with a large room size in Scarborough, however in downtown Toronto, it is hard to rent a house or basement around the university of Toronto and the only choice is to rent a small condo. Living in downtown Mississauga is also very expensive, but there still have house to rent for another option. Beside, the cost for 1 unit square of feet in Mississauga is still cheaper than in Toronto. Using model to calculate the rent, we can get the result is if you are going to live in Toronto, than it is cheaper to rent a small condo, and if you are going to live in Scarborough, it is better to rent a large condo.\newline
+Pet regulation is always a hard question. By collecting the data,if we carrying a pet, the choices are less and the buildings are old. However, if we selecting apartments without a pet, the option is a lot more. The model also mentioned that if we carrying a pet, the rent will increase 82.285 in total every month, that is also a huge a mount if you are going to rent for 2 or more years.
+
+
+## Key features, strenths and weakness
+The dataset collected a large amount of data for each selected respondent as well as some information about household, including rent, bedroom, bathroom,size,den,pet,location.\newline
+
+In order to avoid invalid answers, this data has eliminated all missing value. This methodology the accuracy of the data set. The large amount of data also enables statistician to explore various topic to rent in Canada.\newline
+
+The model still have the weakness part like the number of bedroom and bathroom. In downtown Toronto, most condo have 2 bedrooms and 2 bathrooms at most, but in Mississauga and Scarborough, there exist house layout with 3 or more rooms.\newline
+
+The future step I would like to take is to have a survey through those who already settle down in Downtown Toronto, Downtown Mississauga, and Scarborough(alone 401 highway) and investigate by three major parts, first is the rent, second is the house size and third is the score of satisfaction of the place you currently living.
+
+# Appendix
+https://github.com/yyanwang1/304-Final
+
+# Reference
+ [1]H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+ [2]RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC, Boston, MA URL http://www.rstudio.com/
+ [3]Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686,
+  https://doi.org/10.21105/joss.01686
+  [4]Yihui Xie andJ.J. Allaire and Garrett Grolemund (2018). R Markdown:The Definitive Guide. Chapman and Hall/CRC. URL https://bookdown.org/yihui/rmarkdown.
+  [5]Yihui Xie (2020). tinytex: Helper Functions to Install and Maintain 'TeX Live', and Compile 'LaTeX'
+  Documents. R package version 0.21.
+  [6]“Toronto, ON Apartments, Condos &amp; Houses For Rent.” TorontoRentals.com, www.torontorentals.com/toronto. 
+
+
+
